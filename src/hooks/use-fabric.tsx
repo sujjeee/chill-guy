@@ -76,6 +76,7 @@ export function useFabric() {
         originY: "top",
         left: 0,
         top: 0,
+        objectCaching: false,
       })
 
       canvas.backgroundImage = img
@@ -117,7 +118,7 @@ export function useFabric() {
       return
     }
 
-    const memeText = new fabric.Textbox("Your Meme Text Here", {
+    const memeText = new fabric.Textbox("Your Text Here", {
       left: canvas.getWidth() / 2,
       top: canvas.getHeight() / 2,
       width: canvas.getWidth() * 0.8,
@@ -232,6 +233,27 @@ export function useFabric() {
     }
   }
 
+  function downloadCanvas() {
+    const canvas = canvasRef.current
+    if (!canvas) {
+      console.error("Canvas is not initialized")
+      return
+    }
+
+    const dataURL = canvas.toDataURL({
+      format: "png",
+      quality: 1,
+      multiplier: 3,
+    })
+
+    const link = document.createElement("a")
+    link.href = dataURL
+    link.download = "chill-guy-meme.png"
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
+
   return {
     canvasRef,
     parentDivRef,
@@ -243,5 +265,6 @@ export function useFabric() {
     changeBackgroundColor,
     currentBackgroundColor: bgColors[currentColorIndex],
     deleteSelectedObject,
+    downloadCanvas,
   }
 }

@@ -12,6 +12,7 @@ interface ToolbarProps {
   addChillGuy: () => void
   flipImage: (direction: "horizontal" | "vertical") => void
   deleteSelectedObject: () => void
+  downloadCanvas: () => void
   changeBackgroundColor: () => void
   currentBackgroundColor: string
 }
@@ -22,6 +23,7 @@ export function Toolbar({
   addChillGuy,
   flipImage,
   deleteSelectedObject,
+  downloadCanvas,
   changeBackgroundColor,
   currentBackgroundColor,
 }: ToolbarProps) {
@@ -118,6 +120,7 @@ export function Toolbar({
             <div className="mx-1.5 h-full w-px bg-[#e5e5e5]"></div>
           </div>
           <Button
+            onClick={downloadCanvas}
             variant="outline"
             size={"icon"}
             className="rounded-full hover:animate-jelly"

@@ -12,6 +12,7 @@ export default function HomePage() {
     addChillGuy,
     flipImage,
     deleteSelectedObject,
+    downloadCanvas,
     changeBackgroundColor,
     currentBackgroundColor,
   } = useFabric()
@@ -22,7 +23,7 @@ export default function HomePage() {
         <div></div>
         <div
           ref={parentDivRef}
-          className="h-[500px] border rounded-2xl overflow-hidden w-full"
+          className="h-[500px] border rounded-3xl overflow-hidden w-full"
           style={{
             maxWidth: canvasDimensions.width,
             backgroundColor: currentBackgroundColor,
@@ -37,6 +38,7 @@ export default function HomePage() {
             addChillGuy={addChillGuy}
             flipImage={flipImage}
             deleteSelectedObject={deleteSelectedObject}
+            downloadCanvas={downloadCanvas}
             changeBackgroundColor={changeBackgroundColor}
             currentBackgroundColor={currentBackgroundColor}
           />
