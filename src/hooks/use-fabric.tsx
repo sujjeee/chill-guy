@@ -2,9 +2,20 @@ import React from "react"
 import { Canvas, FabricImage } from "fabric"
 import * as fabric from "fabric"
 
+export const bgColors = [
+  "#8d927b",
+  "#a0b0c0",
+  "#c0a0b0",
+  "#b0c0a0",
+  "#a0c0b0",
+  "#b0a0c0",
+  "#c0b0a0",
+]
+
 export function useFabric() {
   const canvasRef = React.useRef<Canvas | null>(null)
   const parentDivRef = React.useRef<HTMLDivElement | null>(null)
+  const [currentColorIndex, setCurrentColorIndex] = React.useState(0)
 
   const [canvasDimensions, setCanvasDimensions] = React.useState({
     width: 500,
@@ -23,6 +34,9 @@ export function useFabric() {
       height: 500,
       width: 500,
     })
+
+    canvas.backgroundColor = bgColors[0]
+    canvas.renderAll()
 
     canvasRef.current = canvas
 
@@ -79,6 +93,22 @@ export function useFabric() {
     }
   }
 
+  function changeBackgroundColor() {
+    const canvas = canvasRef.current
+    if (!canvas) {
+      console.error("Canvas is not initialized")
+      return
+    }
+
+    const nextIndex = (currentColorIndex + 1) % bgColors.length
+    const nextColor = bgColors[nextIndex]
+
+    canvas.backgroundColor = nextColor
+    canvas.renderAll()
+
+    setCurrentColorIndex(nextIndex)
+  }
+
   async function addText() {
     const canvas = canvasRef.current
 
@@ -90,6 +120,7 @@ export function useFabric() {
     const memeText = new fabric.Textbox("Your Meme Text Here", {
       left: canvas.getWidth() / 2,
       top: canvas.getHeight() / 2,
+      width: canvas.getWidth() * 0.8,
       fontSize: 40,
       fontFamily: "Impact",
       fill: "white",
@@ -113,8 +144,7 @@ export function useFabric() {
       return
     }
 
-    const imageUrl =
-      "https://i.ibb.co/XzgSxdY/6032aebb-0624-460c-a8cb-aa2df3e7de28.png"
+    const imageUrl = "http://localhost:3000/chillguy.png"
 
     try {
       const img = await FabricImage.fromURL(imageUrl)
@@ -129,26 +159,25 @@ export function useFabric() {
       const canvasHeight = canvas.getHeight()
 
       // Scale the image to fit within the canvas (with padding)
-      const maxWidth = canvasWidth * 0.8 // Reduce the size to 80% of the canvas width
-      const maxHeight = canvasHeight * 0.8 // Reduce the size to 80% of the canvas height
+      const maxWidth = canvasWidth * 0.5
+      const maxHeight = canvasHeight * 0.5
       const scaleX = maxWidth / img.width!
       const scaleY = maxHeight / img.height!
-      const scale = Math.min(scaleX, scaleY) // Choose the smaller scale to maintain aspect ratio
+      const scale = Math.min(scaleX, scaleY)
 
       img.set({
         scaleX: scale,
         scaleY: scale,
-        left: canvasWidth / 2, // Center horizontally
-        top: canvasHeight / 2, // Center vertically
-        originX: "center", // Center the origin horizontally
-        originY: "center", // Center the origin vertically
-        selectable: true, // Allow users to resize and drag
+        left: canvasWidth / 2,
+        top: canvasHeight / 2,
+        originX: "center",
+        originY: "center",
+        selectable: true,
       })
 
-      // Add the image to the canvas
       canvas.add(img)
-      canvas.setActiveObject(img) // Set the image as the active object
-      canvas.renderAll() // Re-render the canvas
+      canvas.setActiveObject(img)
+      canvas.renderAll()
 
       console.log("Image added to canvas in the center")
     } catch (error) {
@@ -183,6 +212,26 @@ export function useFabric() {
     }
   }
 
+  function deleteSelectedObject() {
+    const canvas = canvasRef.current
+    if (!canvas) {
+      console.error("Canvas is not initialized")
+      return
+    }
+
+    const activeObject = canvas.getActiveObject()
+
+    if (activeObject) {
+      // If an object is selected
+      canvas.remove(activeObject)
+      canvas.discardActiveObject()
+      canvas.renderAll()
+      console.log("Selected object deleted")
+    } else {
+      console.warn("No object selected to delete")
+    }
+  }
+
   return {
     canvasRef,
     parentDivRef,
@@ -191,5 +240,8 @@ export function useFabric() {
     addText,
     addChillGuy,
     flipImage,
+    changeBackgroundColor,
+    currentBackgroundColor: bgColors[currentColorIndex],
+    deleteSelectedObject,
   }
 }

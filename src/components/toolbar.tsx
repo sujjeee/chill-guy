@@ -11,6 +11,9 @@ interface ToolbarProps {
   addText: () => void
   addChillGuy: () => void
   flipImage: (direction: "horizontal" | "vertical") => void
+  deleteSelectedObject: () => void
+  changeBackgroundColor: () => void
+  currentBackgroundColor: string
 }
 
 export function Toolbar({
@@ -18,6 +21,9 @@ export function Toolbar({
   addText,
   addChillGuy,
   flipImage,
+  deleteSelectedObject,
+  changeBackgroundColor,
+  currentBackgroundColor,
 }: ToolbarProps) {
   const onDrop = React.useCallback(
     (acceptedFiles: File[]) => {
@@ -40,82 +46,84 @@ export function Toolbar({
     accept,
     maxFiles: 1,
   })
+
   return (
-    <div className="fixed bottom-10 w-full">
-      <div className="mx-auto flex items-center justify-center gap-4">
-        <div className="flex flex-col items-center space-y-5 pb-4 pt-10">
-          <div className="max-w-[100vw] px-5">
-            <div className="no-scrollbar w-full overflow-x-auto rounded-full border bg-white sm:overflow-visible">
-              <div className="flex items-center space-x-2 p-2 text-2xl md:justify-center">
-                <Button
-                  {...getRootProps()}
-                  variant="outline"
-                  size={"icon"}
-                  className="rounded-full hover:animate-jelly"
-                >
-                  <input {...getInputProps()} />
-                  <Icons.background className="size-4" />
-                </Button>
-                <div className="h-5">
-                  <div className="mx-1.5 h-full w-px bg-[#e5e5e5]"></div>
-                </div>
-
-                <Button
-                  onClick={addChillGuy}
-                  variant="outline"
-                  size={"icon"}
-                  className="rounded-full hover:animate-jelly"
-                >
-                  <img
-                    src="https://i.ibb.co/XzgSxdY/6032aebb-0624-460c-a8cb-aa2df3e7de28.png"
-                    className="size-6"
-                  />
-                </Button>
-
-                <Button
-                  onClick={() => flipImage("horizontal")}
-                  variant="outline"
-                  size={"icon"}
-                  className="rounded-full hover:animate-jelly"
-                >
-                  <Icons.flip className="size-4" />
-                </Button>
-
-                <div className="h-5">
-                  <div className="mx-1.5 h-full w-px bg-[#e5e5e5]"></div>
-                </div>
-
-                <Button
-                  onClick={addText}
-                  variant="outline"
-                  size={"icon"}
-                  className="rounded-full hover:animate-jelly"
-                >
-                  <Icons.text className="size-4" />
-                </Button>
-
-                <div className="h-5">
-                  <div className="mx-1.5 h-full w-px bg-[#e5e5e5]"></div>
-                </div>
-
-                <Button
-                  variant="outline"
-                  size={"icon"}
-                  className="rounded-full hover:animate-jelly"
-                >
-                  <Icons.download className="size-4" />
-                </Button>
-
-                <Button
-                  variant="outline"
-                  size={"icon"}
-                  className="rounded-full hover:animate-jelly"
-                >
-                  <Icons.github className="size-4" />
-                </Button>
-              </div>
-            </div>
+    <div className="max-w-[100vw] px-5">
+      <div className="no-scrollbar w-full overflow-x-auto rounded-full border bg-white sm:overflow-visible">
+        <div className="flex items-center space-x-2 p-2 text-2xl md:justify-center">
+          <Button
+            {...getRootProps()}
+            variant="outline"
+            size={"icon"}
+            className="rounded-full hover:animate-jelly"
+          >
+            <input {...getInputProps()} />
+            <Icons.background className="size-4" />
+          </Button>
+          <Button
+            onClick={changeBackgroundColor}
+            variant="outline"
+            size={"icon"}
+            className="rounded-full hover:animate-jelly"
+            style={{ backgroundColor: currentBackgroundColor }}
+          ></Button>
+          <div className="h-5">
+            <div className="mx-1.5 h-full w-px bg-[#e5e5e5]"></div>
           </div>
+
+          <Button
+            onClick={addChillGuy}
+            variant="outline"
+            size={"icon"}
+            className="rounded-full hover:animate-jelly"
+          >
+            <img src="http://localhost:3000/chillguy.png" className="size-6" />
+          </Button>
+
+          <Button
+            onClick={() => flipImage("horizontal")}
+            variant="outline"
+            size={"icon"}
+            className="rounded-full hover:animate-jelly"
+          >
+            <Icons.flip className="size-4" />
+          </Button>
+
+          <div className="h-5">
+            <div className="mx-1.5 h-full w-px bg-[#e5e5e5]"></div>
+          </div>
+
+          <Button
+            onClick={addText}
+            variant="outline"
+            size={"icon"}
+            className="rounded-full hover:animate-jelly"
+          >
+            <Icons.text className="size-4" />
+          </Button>
+
+          <div className="h-5">
+            <div className="mx-1.5 h-full w-px bg-[#e5e5e5]"></div>
+          </div>
+
+          <Button
+            onClick={deleteSelectedObject}
+            variant="outline"
+            size={"icon"}
+            className="rounded-full hover:animate-jelly"
+          >
+            <Icons.trash className="size-4 text-red-600" />
+          </Button>
+          <div className="h-5">
+            <div className="mx-1.5 h-full w-px bg-[#e5e5e5]"></div>
+          </div>
+          <Button
+            variant="outline"
+            size={"icon"}
+            className="rounded-full hover:animate-jelly"
+          >
+            <Icons.download className="size-4" />
+          </Button>
         </div>
       </div>
     </div>
