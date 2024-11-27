@@ -1,17 +1,24 @@
-import { useRef, useEffect } from "react"
-import { fabric } from "fabric"
+import React from "react"
+import { Canvas, FabricImage } from "fabric"
 
-export const useFabric = (canvasId: string) => {
-  const canvasRef = useRef<fabric.Canvas | null>(null)
+export function useFabric() {
+  const canvasRef = React.useRef<Canvas | null>(null)
+  const parentDivRef = React.useRef<HTMLDivElement | null>(null)
 
-  useEffect(() => {
-    const canvasElement = document.getElementById(canvasId) as HTMLCanvasElement
+  const [canvasDimensions, setCanvasDimensions] = React.useState({
+    width: 500,
+    height: 500,
+  })
+
+  React.useEffect(() => {
+    const canvasElement = document.getElementById("canvas") as HTMLCanvasElement
+
     if (!canvasElement) {
-      console.error("Canvas element not found")
+      console.log("Canvas element not found!")
       return
     }
 
-    const canvas = new fabric.Canvas(canvasElement, {
+    const canvas = new Canvas(canvasElement, {
       height: 500,
       width: 500,
     })
@@ -21,21 +28,29 @@ export const useFabric = (canvasId: string) => {
     return () => {
       canvas.dispose()
     }
-  }, [canvasId])
+  }, [])
 
-  const setBackgroundImage = async (imageUrl: string) => {
+  async function setBackgroundImage(imageUrl: string): Promise<Canvas | null> {
     const canvas = canvasRef.current
-    if (!canvas) {
-      console.error("Canvas is not initialized")
-      return
+    const parentDiv = parentDivRef.current
+
+    if (!canvas || !parentDiv) {
+      console.error("Canvas or parent div is not initialized")
+      return null
     }
 
     try {
-      const img = await fabric.Image.fromURL(imageUrl)
+      const img = await FabricImage.fromURL(imageUrl)
 
-      // Adjust canvas width dynamically based on image aspect ratio
+      if (!img) {
+        alert("Failed to load image")
+        return null
+      }
+
       const aspectRatio = img.width! / img.height!
       const newWidth = 500 * aspectRatio
+
+      parentDiv.style.width = `${newWidth}px`
 
       canvas.setDimensions({ width: newWidth, height: 500 })
 
@@ -48,12 +63,25 @@ export const useFabric = (canvasId: string) => {
         top: 0,
       })
 
-      canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas))
-      // console.log("Background image set");
+      canvas.backgroundImage = img
+      canvas.renderAll()
+
+      setCanvasDimensions({
+        width: newWidth,
+        height: 500,
+      })
+
+      return canvas
     } catch (error) {
       console.error("Error setting background image:", error)
+      return null
     }
   }
 
-  return { canvasRef, setBackgroundImage }
+  return {
+    canvasRef,
+    parentDivRef,
+    canvasDimensions,
+    setBackgroundImage,
+  }
 }
