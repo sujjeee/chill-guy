@@ -1,117 +1,59 @@
-import { useCallback, useEffect, useState } from "react"
+import { useRef, useEffect } from "react"
 import { fabric } from "fabric"
 
-export const useFabricCanvas = (
-  canvasRef: React.RefObject<HTMLCanvasElement>,
-) => {
-  const [canvas, setCanvas] = useState<fabric.Canvas | null>(null)
-
-  const initCanvas = useCallback(() => {
-    if (canvasRef.current) {
-      const fabricCanvas = new fabric.Canvas(canvasRef.current, {
-        width: 500,
-        height: 500,
-        backgroundColor: "#f0f0f0",
-        renderOnAddRemove: false,
-        stateful: false,
-      })
-      fabricCanvas.selection = false
-      setCanvas(fabricCanvas)
-
-      return () => {
-        fabricCanvas.dispose()
-      }
-    }
-  }, [canvasRef])
+export const useFabric = (canvasId: string) => {
+  const canvasRef = useRef<fabric.Canvas | null>(null)
 
   useEffect(() => {
-    const cleanup = initCanvas()
-    return cleanup
-  }, [initCanvas])
-
-  const addObjectWithBoundaryCheck = useCallback(
-    (obj: fabric.Object) => {
-      if (!canvas) return
-
-      obj.setCoords()
-
-      const canvasWidth = canvas.width ?? 500
-      const canvasHeight = canvas.height ?? 500
-
-      obj.on("moving", () => {
-        const objWidth = obj.getScaledWidth()
-        const objHeight = obj.getScaledHeight()
-
-        obj.left = Math.min(Math.max(obj.left ?? 0, 0), canvasWidth - objWidth)
-        obj.top = Math.min(Math.max(obj.top ?? 0, 0), canvasHeight - objHeight)
-      })
-
-      canvas.add(obj)
-      canvas.requestRenderAll()
-    },
-    [canvas],
-  )
-
-  const addText = useCallback(
-    (text: string, fontSize: number) => {
-      if (canvas) {
-        const fabricText = new fabric.Textbox(text, {
-          left: 50,
-          top: 50,
-          fontSize: fontSize,
-          fill: "black",
-          width: 400,
-          breakWords: true,
-        })
-
-        addObjectWithBoundaryCheck(fabricText)
-      }
-    },
-    [canvas, addObjectWithBoundaryCheck],
-  )
-
-  const changeFontSize = useCallback(
-    (newSize: number) => {
-      const activeObject = canvas?.getActiveObject()
-      if (activeObject && activeObject.type === "textbox") {
-        activeObject.set("fontSize", newSize)
-        canvas?.requestRenderAll()
-      }
-    },
-    [canvas],
-  )
-
-  const addImage = useCallback(
-    (file: File) => {
-      if (canvas) {
-        const reader = new FileReader()
-        reader.onload = (f) => {
-          const data = f.target?.result
-          fabric.Image.fromURL(
-            data as string,
-            (img) => {
-              img.scaleToWidth(200)
-              addObjectWithBoundaryCheck(img)
-            },
-            { crossOrigin: "anonymous" },
-          )
-        }
-        reader.readAsDataURL(file)
-      }
-    },
-    [canvas, addObjectWithBoundaryCheck],
-  )
-
-  useEffect(() => {
-    if (canvas) {
-      canvas.on("object:moving", () => {
-        canvas.requestRenderAll()
-      })
-      canvas.on("object:scaling", () => {
-        canvas.requestRenderAll()
-      })
+    const canvasElement = document.getElementById(canvasId) as HTMLCanvasElement
+    if (!canvasElement) {
+      console.error("Canvas element not found")
+      return
     }
-  }, [canvas])
 
-  return { canvas, addText, changeFontSize, addImage }
+    const canvas = new fabric.Canvas(canvasElement, {
+      height: 500,
+      width: 500,
+    })
+
+    canvasRef.current = canvas
+
+    return () => {
+      canvas.dispose()
+    }
+  }, [canvasId])
+
+  const setBackgroundImage = async (imageUrl: string) => {
+    const canvas = canvasRef.current
+    if (!canvas) {
+      console.error("Canvas is not initialized")
+      return
+    }
+
+    try {
+      const img = await fabric.Image.fromURL(imageUrl)
+
+      // Adjust canvas width dynamically based on image aspect ratio
+      const aspectRatio = img.width! / img.height!
+      const newWidth = 500 * aspectRatio
+
+      canvas.setDimensions({ width: newWidth, height: 500 })
+
+      img.set({
+        scaleX: newWidth / img.width!,
+        scaleY: 500 / img.height!,
+        originX: "left",
+        originY: "top",
+        left: 0,
+        top: 0,
+      })
+
+      canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas))
+      // console.log("Background image set");
+    } catch (error) {
+      console.error("Error setting background image:", error)
+    }
+  }
+
+  return { canvasRef, setBackgroundImage }
 }
