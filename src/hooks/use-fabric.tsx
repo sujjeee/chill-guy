@@ -248,7 +248,7 @@ export function useFabric() {
 
     const link = document.createElement("a")
     link.href = dataURL
-    link.download = "chill-guy-meme.png"
+    link.download = "meme.png"
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
