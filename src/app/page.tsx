@@ -4,7 +4,14 @@ import { Toolbar } from "@/components/toolbar"
 import { useFabric } from "@/hooks/use-fabric"
 
 export default function HomePage() {
-  const { parentDivRef, canvasDimensions, setBackgroundImage } = useFabric()
+  const {
+    parentDivRef,
+    canvasDimensions,
+    setBackgroundImage,
+    addText,
+    addChillGuy,
+    flipImage,
+  } = useFabric()
 
   return (
     <>
@@ -12,14 +19,19 @@ export default function HomePage() {
       <section className="flex-1 container fixed left-1/2 top-1/2 flex  -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center px-4 w-full">
         <div
           ref={parentDivRef}
-          className="h-[500px] bg-gray-800 border rounded-2xl overflow-hidden"
+          className="h-[500px] bg-white border rounded-2xl overflow-hidden"
           style={{ width: canvasDimensions.width }}
         >
           <canvas id="canvas"></canvas>
         </div>
       </section>
 
-      <Toolbar setBackgroundImage={setBackgroundImage} />
+      <Toolbar
+        setBackgroundImage={setBackgroundImage}
+        addText={addText}
+        addChillGuy={addChillGuy}
+        flipImage={flipImage}
+      />
     </>
   )
 }

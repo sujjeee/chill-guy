@@ -8,9 +8,17 @@ import { Canvas } from "fabric"
 
 interface ToolbarProps {
   setBackgroundImage: (imageUrl: string) => Promise<Canvas | null>
+  addText: () => void
+  addChillGuy: () => void
+  flipImage: (direction: "horizontal" | "vertical") => void
 }
 
-export function Toolbar({ setBackgroundImage }: ToolbarProps) {
+export function Toolbar({
+  setBackgroundImage,
+  addText,
+  addChillGuy,
+  flipImage,
+}: ToolbarProps) {
   const onDrop = React.useCallback(
     (acceptedFiles: File[]) => {
       if (acceptedFiles.length > 0) {
@@ -53,6 +61,7 @@ export function Toolbar({ setBackgroundImage }: ToolbarProps) {
                 </div>
 
                 <Button
+                  onClick={addChillGuy}
                   variant="outline"
                   size={"icon"}
                   className="rounded-full hover:animate-jelly"
@@ -64,6 +73,7 @@ export function Toolbar({ setBackgroundImage }: ToolbarProps) {
                 </Button>
 
                 <Button
+                  onClick={() => flipImage("horizontal")}
                   variant="outline"
                   size={"icon"}
                   className="rounded-full hover:animate-jelly"
@@ -76,6 +86,7 @@ export function Toolbar({ setBackgroundImage }: ToolbarProps) {
                 </div>
 
                 <Button
+                  onClick={addText}
                   variant="outline"
                   size={"icon"}
                   className="rounded-full hover:animate-jelly"
