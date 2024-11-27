@@ -1,14 +1,6 @@
-"use client"
+import { Upload } from "@/components/upload"
+import React from "react"
 
-import { useRef } from "react"
-
-export default function HomePage() {
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-
-  return (
-    <canvas
-      ref={canvasRef}
-      className="rounded-lg bg-red-600 w-full max-w-[800px] border-border "
-    />
-  )
+export default function Page() {
+  return <Upload />
 }
