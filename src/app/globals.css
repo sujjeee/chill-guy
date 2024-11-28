@@ -71,6 +71,45 @@ body {
   }
 }
 
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.tooltiptext {
+  display: none;
+}
+
+@media (min-width: 640px) {
+  .tooltiptext {
+    display: block;
+  }
+}
+
+.tooltip .tooltiptext {
+  text-align: center;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  visibility: hidden;
+  width: 120px;
+  color: #000;
+  border-radius: 6px;
+  padding: 5px 0;
+  position: absolute;
+  z-index: 1;
+  bottom: 150%;
+  left: 50%;
+  margin-left: -60px;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}
+
 @keyframes jelly {
   0%,
   to {

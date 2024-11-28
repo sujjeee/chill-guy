@@ -48,7 +48,7 @@ export default function HomePage() {
               href="https://x.com/intent/follow?screen_name=sujjeeee"
               target="_blank"
             >
-              Built by sujjeee
+              Built by Sujjeee
             </a>
           </div>
         </div>
