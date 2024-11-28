@@ -82,7 +82,10 @@ export function Toolbar({
             className="rounded-full hover:animate-jelly tooltip"
           >
             <span className="tooltiptext">Chill Guy</span>
-            <img src="http://localhost:3000/chillguy.png" className="size-6" />
+            <img
+              src={`${process.env.NEXT_PUBLIC_APP_URL}/chillguy.png`}
+              className="size-6"
+            />
           </Button>
           <Button
             onClick={() => flipImage("horizontal")}

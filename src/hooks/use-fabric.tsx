@@ -145,7 +145,7 @@ export function useFabric() {
       return
     }
 
-    const imageUrl = "http://localhost:3000/chillguy.png"
+    const imageUrl = `${process.env.NEXT_PUBLIC_APP_URL}/chillguy.png`
 
     try {
       const img = await FabricImage.fromURL(imageUrl)
