@@ -1,7 +1,8 @@
 "use client"
 
 import { Toolbar } from "@/components/toolbar"
-import { bgColors, useFabric } from "@/hooks/use-fabric"
+import { useFabric } from "@/hooks/use-fabric"
+import { useWindow } from "@/hooks/use-window"
 
 export default function HomePage() {
   const {
@@ -16,6 +17,19 @@ export default function HomePage() {
     changeBackgroundColor,
     currentBackgroundColor,
   } = useFabric()
+
+  const { isMobile } = useWindow()
+
+  if (isMobile) {
+    return (
+      <div className="h-screen w-full flex justify-center items-center text-center px-4">
+        <span className=" ">
+          Isn't optimized for mobile devices yet. Please use the desktop version
+          for the best experience.
+        </span>
+      </div>
+    )
+  }
 
   return (
     <>
