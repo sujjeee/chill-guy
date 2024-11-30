@@ -63,7 +63,7 @@ export function Toolbar({
             {...getRootProps()}
             variant="outline"
             size={"icon"}
-            className="rounded-full hover:animate-jelly tooltip"
+            className="rounded-full hover:animate-jelly tooltip shrink-0 "
           >
             <span className="tooltiptext">Background</span>
             <input {...getInputProps()} />
@@ -75,7 +75,7 @@ export function Toolbar({
               <Button
                 variant="outline"
                 size={"icon"}
-                className="rounded-full hover:animate-jelly tooltip"
+                className="rounded-full hover:animate-jelly tooltip shrink-0 "
                 style={{ backgroundColor: currentBackgroundColor }}
               >
                 <span className="tooltiptext">Color</span>
@@ -94,7 +94,7 @@ export function Toolbar({
             onClick={addChillGuy}
             variant="outline"
             size={"icon"}
-            className="rounded-full hover:animate-jelly tooltip"
+            className="rounded-full hover:animate-jelly tooltip shrink-0 "
           >
             <span className="tooltiptext">Chill Guy</span>
             <img
@@ -106,7 +106,7 @@ export function Toolbar({
             onClick={() => flipImage("horizontal")}
             variant="outline"
             size={"icon"}
-            className="rounded-full hover:animate-jelly tooltip"
+            className="rounded-full hover:animate-jelly tooltip shrink-0"
           >
             <span className="tooltiptext">Flip</span>
             <Icons.flip className="size-4" />
@@ -115,7 +115,7 @@ export function Toolbar({
             onClick={addText}
             variant="outline"
             size={"icon"}
-            className="rounded-full hover:animate-jelly tooltip"
+            className="rounded-full hover:animate-jelly tooltip shrink-0 "
           >
             <span className="tooltiptext">Text</span>
             <Icons.text className="size-4" />
@@ -124,7 +124,7 @@ export function Toolbar({
             onClick={deleteSelectedObject}
             variant="outline"
             size={"icon"}
-            className="rounded-full hover:animate-jelly tooltip"
+            className="rounded-full hover:animate-jelly tooltip shrink-0 "
           >
             <span className="tooltiptext">Delete</span>
             <Icons.trash className="size-4 text-red-600" />
@@ -133,7 +133,7 @@ export function Toolbar({
             onClick={downloadCanvas}
             variant="outline"
             size={"icon"}
-            className="rounded-full hover:animate-jelly tooltip"
+            className="rounded-full hover:animate-jelly tooltip shrink-0 "
           >
             <span className="tooltiptext">Download</span>
             <Icons.download className="size-4" />
