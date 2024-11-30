@@ -4,7 +4,13 @@ import React from "react"
 import { Button } from "@/components/ui/button"
 import { Icons } from "./icons"
 import { type Accept, useDropzone } from "react-dropzone"
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from "@radix-ui/react-popover"
 import { Canvas } from "fabric"
+import { HexColorPicker } from "react-colorful"
 
 interface ToolbarProps {
   setBackgroundImage: (imageUrl: string) => Promise<Canvas | null>
@@ -13,7 +19,7 @@ interface ToolbarProps {
   flipImage: (direction: "horizontal" | "vertical") => void
   deleteSelectedObject: () => void
   downloadCanvas: () => void
-  changeBackgroundColor: () => void
+  changeBackgroundColor: (color: string) => void
   currentBackgroundColor: string
 }
 
@@ -50,7 +56,7 @@ export function Toolbar({
   })
 
   return (
-    <div className="max-w-[100vw] px-5">
+    <div className="relative max-w-[100vw] px-5">
       <div className="no-scrollbar w-full overflow-x-auto rounded-full border bg-white sm:overflow-visible">
         <div className="flex items-center space-x-2 p-2 text-2xl md:justify-center">
           <Button
@@ -63,18 +69,27 @@ export function Toolbar({
             <input {...getInputProps()} />
             <Icons.background className="size-4" />
           </Button>
-          <Button
-            onClick={changeBackgroundColor}
-            variant="outline"
-            size={"icon"}
-            className="rounded-full hover:animate-jelly tooltip"
-            style={{ backgroundColor: currentBackgroundColor }}
-          >
-            <span className="tooltiptext">Color</span>
-          </Button>
-          <div className="h-5">
-            <div className="mx-1.5 h-full w-px bg-[#e5e5e5]"></div>
-          </div>
+
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                size={"icon"}
+                className="rounded-full hover:animate-jelly tooltip"
+                style={{ backgroundColor: currentBackgroundColor }}
+              >
+                <span className="tooltiptext">Color</span>
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="mt-3 w-fit p-0" align="start">
+              <HexColorPicker
+                color={currentBackgroundColor}
+                onChange={(color: string) => {
+                  return changeBackgroundColor(color)
+                }}
+              />
+            </PopoverContent>
+          </Popover>
           <Button
             onClick={addChillGuy}
             variant="outline"
@@ -93,12 +108,9 @@ export function Toolbar({
             size={"icon"}
             className="rounded-full hover:animate-jelly tooltip"
           >
-            <span className="tooltiptext">Filp</span>
+            <span className="tooltiptext">Flip</span>
             <Icons.flip className="size-4" />
           </Button>
-          <div className="h-5">
-            <div className="mx-1.5 h-full w-px bg-[#e5e5e5]"></div>
-          </div>
           <Button
             onClick={addText}
             variant="outline"
@@ -108,9 +120,6 @@ export function Toolbar({
             <span className="tooltiptext">Text</span>
             <Icons.text className="size-4" />
           </Button>
-          <div className="h-5">
-            <div className="mx-1.5 h-full w-px bg-[#e5e5e5]"></div>
-          </div>
           <Button
             onClick={deleteSelectedObject}
             variant="outline"
@@ -120,9 +129,6 @@ export function Toolbar({
             <span className="tooltiptext">Delete</span>
             <Icons.trash className="size-4 text-red-600" />
           </Button>
-          <div className="h-5">
-            <div className="mx-1.5 h-full w-px bg-[#e5e5e5]"></div>
-          </div>
           <Button
             onClick={downloadCanvas}
             variant="outline"

@@ -2,20 +2,11 @@ import React from "react"
 import { Canvas, FabricImage } from "fabric"
 import * as fabric from "fabric"
 
-export const bgColors = [
-  "#8d927b",
-  "#a0b0c0",
-  "#c0a0b0",
-  "#b0c0a0",
-  "#a0c0b0",
-  "#b0a0c0",
-  "#c0b0a0",
-]
-
 export function useFabric() {
   const canvasRef = React.useRef<Canvas | null>(null)
   const parentDivRef = React.useRef<HTMLDivElement | null>(null)
-  const [currentColorIndex, setCurrentColorIndex] = React.useState(0)
+  const [currentBackgroundColor, setCurrentBackgroundColor] =
+    React.useState<string>("#8d927b")
 
   const [canvasDimensions, setCanvasDimensions] = React.useState({
     width: 500,
@@ -35,7 +26,7 @@ export function useFabric() {
       width: 500,
     })
 
-    canvas.backgroundColor = bgColors[0]
+    canvas.backgroundColor = currentBackgroundColor
     canvas.renderAll()
 
     canvasRef.current = canvas
@@ -94,20 +85,17 @@ export function useFabric() {
     }
   }
 
-  function changeBackgroundColor() {
+  function changeBackgroundColor(color: string) {
     const canvas = canvasRef.current
+
     if (!canvas) {
       console.error("Canvas is not initialized")
       return
     }
 
-    const nextIndex = (currentColorIndex + 1) % bgColors.length
-    const nextColor = bgColors[nextIndex]
-
-    canvas.backgroundColor = nextColor
+    setCurrentBackgroundColor(color)
+    canvas.backgroundColor = color
     canvas.renderAll()
-
-    setCurrentColorIndex(nextIndex)
   }
 
   async function addText() {
@@ -263,7 +251,8 @@ export function useFabric() {
     addChillGuy,
     flipImage,
     changeBackgroundColor,
-    currentBackgroundColor: bgColors[currentColorIndex],
+    currentBackgroundColor,
+    setCurrentBackgroundColor,
     deleteSelectedObject,
     downloadCanvas,
   }

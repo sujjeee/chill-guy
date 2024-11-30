@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import { Toolbar } from "@/components/toolbar"
-import { useFabric } from "@/hooks/use-fabric"
-import { useWindow } from "@/hooks/use-window"
+import { Toolbar } from "@/components/toolbar";
+import { useFabric } from "@/hooks/use-fabric";
+import { useWindow } from "@/hooks/use-window";
 
 export default function HomePage() {
   const {
@@ -16,9 +16,9 @@ export default function HomePage() {
     downloadCanvas,
     changeBackgroundColor,
     currentBackgroundColor,
-  } = useFabric()
+  } = useFabric();
 
-  const { isMobile } = useWindow()
+  const { isMobile } = useWindow();
 
   if (isMobile) {
     return (
@@ -28,7 +28,7 @@ export default function HomePage() {
           for the best experience.
         </span>
       </div>
-    )
+    );
   }
 
   return (
@@ -68,5 +68,5 @@ export default function HomePage() {
         </div>
       </div>
     </>
-  )
+  );
 }
