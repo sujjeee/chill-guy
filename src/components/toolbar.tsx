@@ -113,7 +113,7 @@ export function Toolbar({
             size={"icon"}
             className="rounded-full hover:animate-jelly tooltip shrink-0"
           >
-            <span className="tooltiptext">Filp</span>
+            <span className="tooltiptext">Flip</span>
             <Icons.flip className="size-4" />
           </Button>
           <div className="h-5">
