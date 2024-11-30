@@ -1,77 +1,64 @@
-import React from "react";
-import { Canvas, FabricImage } from "fabric";
-import * as fabric from "fabric";
-
-// export const bgColors = [
-//   "#8d927b",
-//   "#a0b0c0",
-//   "#c0a0b0",
-//   "#b0c0a0",
-//   "#a0c0b0",
-//   "#b0a0c0",
-//   "#c0b0a0",
-// ];
+import React from "react"
+import { Canvas, FabricImage } from "fabric"
+import * as fabric from "fabric"
 
 export function useFabric() {
-  const canvasRef = React.useRef<Canvas | null>(null);
-  const parentDivRef = React.useRef<HTMLDivElement | null>(null);
+  const canvasRef = React.useRef<Canvas | null>(null)
+  const parentDivRef = React.useRef<HTMLDivElement | null>(null)
   const [currentBackgroundColor, setCurrentBackgroundColor] =
-    React.useState<string>("#8d927b");
-  // const [currentColorIndex, setCurrentColorIndex] = React.useState(0);
+    React.useState<string>("#8d927b")
 
   const [canvasDimensions, setCanvasDimensions] = React.useState({
     width: 500,
     height: 500,
-  });
+  })
 
   React.useEffect(() => {
-    const canvasElement = document.getElementById(
-      "canvas"
-    ) as HTMLCanvasElement;
+    const canvasElement = document.getElementById("canvas") as HTMLCanvasElement
 
     if (!canvasElement) {
-      console.log("Canvas element not found!");
-      return;
+      console.log("Canvas element not found!")
+      return
     }
 
     const canvas = new Canvas(canvasElement, {
       height: 500,
       width: 500,
-    });
+    })
 
-    canvas.backgroundColor = currentBackgroundColor;
-    canvas.renderAll();
+    canvas.backgroundColor = currentBackgroundColor
+    canvas.renderAll()
 
-    canvasRef.current = canvas;
+    canvasRef.current = canvas
 
     return () => {
-      canvas.dispose();
-    };
-  }, []);
+      canvas.dispose()
+    }
+  }, [])
 
   async function setBackgroundImage(imageUrl: string): Promise<Canvas | null> {
-    const canvas = canvasRef.current;
-    const parentDiv = parentDivRef.current;
+    const canvas = canvasRef.current
+    const parentDiv = parentDivRef.current
 
     if (!canvas || !parentDiv) {
-      console.error("Canvas or parent div is not initialized");
-      return null;
+      console.error("Canvas or parent div is not initialized")
+      return null
     }
 
     try {
-      const img = await FabricImage.fromURL(imageUrl);
+      const img = await FabricImage.fromURL(imageUrl)
 
       if (!img) {
-        alert("Failed to load image");
-        return null;
+        alert("Failed to load image")
+        return null
       }
 
-      const aspectRatio = img.width! / img.height!;
-      const newWidth = 500 * aspectRatio;
+      const aspectRatio = img.width! / img.height!
+      const newWidth = 500 * aspectRatio
 
-      parentDiv.style.width = `${newWidth}px`;
+      parentDiv.style.width = `${newWidth}px`
 
-      canvas.setDimensions({ width: newWidth, height: 500 });
+      canvas.setDimensions({ width: newWidth, height: 500 })
 
       img.set({
         scaleX: newWidth / img.width!,
@@ -81,43 +68,42 @@ export function useFabric() {
         left: 0,
         top: 0,
         objectCaching: false,
-      });
+      })
 
-      canvas.backgroundImage = img;
-      canvas.renderAll();
+      canvas.backgroundImage = img
+      canvas.renderAll()
 
       setCanvasDimensions({
         width: newWidth,
         height: 500,
-      });
+      })
 
-      return canvas;
+      return canvas
     } catch (error) {
-      console.error("Error setting background image:", error);
-      return null;
+      console.error("Error setting background image:", error)
+      return null
     }
   }
 
   function changeBackgroundColor(color: string) {
-    const canvas = canvasRef.current;
+    const canvas = canvasRef.current
+
     if (!canvas) {
-      console.error("Canvas is not initialized");
-      return;
+      console.error("Canvas is not initialized")
+      return
     }
 
-    // const nextIndex = (currentColorIndex + 1) % bgColors.length;
-    // const nextColor = bgColors[nextIndex];
-    setCurrentBackgroundColor(color);
-    canvas.backgroundColor = color;
-    canvas.renderAll();
+    setCurrentBackgroundColor(color)
+    canvas.backgroundColor = color
+    canvas.renderAll()
   }
 
   async function addText() {
-    const canvas = canvasRef.current;
+    const canvas = canvasRef.current
 
     if (!canvas) {
-      console.error("Canvas is not initialized");
-      return;
+      console.error("Canvas is not initialized")
+      return
     }
 
     const memeText = new fabric.Textbox("Your Text Here", {
@@ -133,40 +119,40 @@ export function useFabric() {
       originX: "center",
       originY: "center",
       editable: true,
-    });
+    })
 
-    canvas.add(memeText);
-    canvas.setActiveObject(memeText);
-    canvas.renderAll();
+    canvas.add(memeText)
+    canvas.setActiveObject(memeText)
+    canvas.renderAll()
   }
 
   async function addChillGuy() {
-    const canvas = canvasRef.current;
+    const canvas = canvasRef.current
     if (!canvas) {
-      console.error("Canvas is not initialized");
-      return;
+      console.error("Canvas is not initialized")
+      return
     }
 
-    const imageUrl = `${process.env.NEXT_PUBLIC_APP_URL}/chillguy.png`;
+    const imageUrl = `${process.env.NEXT_PUBLIC_APP_URL}/chillguy.png`
 
     try {
-      const img = await FabricImage.fromURL(imageUrl);
+      const img = await FabricImage.fromURL(imageUrl)
 
       if (!img) {
-        console.error("Failed to load image");
-        return;
+        console.error("Failed to load image")
+        return
       }
 
       // Get canvas dimensions
-      const canvasWidth = canvas.getWidth();
-      const canvasHeight = canvas.getHeight();
+      const canvasWidth = canvas.getWidth()
+      const canvasHeight = canvas.getHeight()
 
       // Scale the image to fit within the canvas (with padding)
-      const maxWidth = canvasWidth * 0.5;
-      const maxHeight = canvasHeight * 0.5;
-      const scaleX = maxWidth / img.width!;
-      const scaleY = maxHeight / img.height!;
-      const scale = Math.min(scaleX, scaleY);
+      const maxWidth = canvasWidth * 0.5
+      const maxHeight = canvasHeight * 0.5
+      const scaleX = maxWidth / img.width!
+      const scaleY = maxHeight / img.height!
+      const scale = Math.min(scaleX, scaleY)
 
       img.set({
         scaleX: scale,
@@ -176,84 +162,84 @@ export function useFabric() {
         originX: "center",
         originY: "center",
         selectable: true,
-      });
+      })
 
-      canvas.add(img);
-      canvas.setActiveObject(img);
-      canvas.renderAll();
+      canvas.add(img)
+      canvas.setActiveObject(img)
+      canvas.renderAll()
 
-      console.log("Image added to canvas in the center");
+      console.log("Image added to canvas in the center")
     } catch (error) {
-      console.error("Error adding image to canvas:", error);
+      console.error("Error adding image to canvas:", error)
     }
   }
 
   function flipImage(direction: "horizontal" | "vertical") {
-    const canvas = canvasRef.current;
+    const canvas = canvasRef.current
     if (!canvas) {
-      console.error("Canvas is not initialized");
-      return;
+      console.error("Canvas is not initialized")
+      return
     }
 
-    const activeObject = canvas.getActiveObject();
+    const activeObject = canvas.getActiveObject()
     if (activeObject && activeObject.type === "image") {
-      const image = activeObject as fabric.Image;
+      const image = activeObject as fabric.Image
 
       // Toggle flipX or flipY based on direction
       if (direction === "horizontal") {
-        image.set("flipX", !image.flipX);
+        image.set("flipX", !image.flipX)
       } else if (direction === "vertical") {
-        image.set("flipY", !image.flipY);
+        image.set("flipY", !image.flipY)
       }
 
       // Re-render the canvas
-      canvas.renderAll();
+      canvas.renderAll()
 
-      console.log(`Image flipped ${direction}`);
+      console.log(`Image flipped ${direction}`)
     } else {
-      console.warn("No image object selected to flip");
+      console.warn("No image object selected to flip")
     }
   }
 
   function deleteSelectedObject() {
-    const canvas = canvasRef.current;
+    const canvas = canvasRef.current
     if (!canvas) {
-      console.error("Canvas is not initialized");
-      return;
+      console.error("Canvas is not initialized")
+      return
     }
 
-    const activeObject = canvas.getActiveObject();
+    const activeObject = canvas.getActiveObject()
 
     if (activeObject) {
       // If an object is selected
-      canvas.remove(activeObject);
-      canvas.discardActiveObject();
-      canvas.renderAll();
-      console.log("Selected object deleted");
+      canvas.remove(activeObject)
+      canvas.discardActiveObject()
+      canvas.renderAll()
+      console.log("Selected object deleted")
     } else {
-      console.warn("No object selected to delete");
+      console.warn("No object selected to delete")
     }
   }
 
   function downloadCanvas() {
-    const canvas = canvasRef.current;
+    const canvas = canvasRef.current
     if (!canvas) {
-      console.error("Canvas is not initialized");
-      return;
+      console.error("Canvas is not initialized")
+      return
     }
 
     const dataURL = canvas.toDataURL({
       format: "png",
       quality: 1,
       multiplier: 3,
-    });
+    })
 
-    const link = document.createElement("a");
-    link.href = dataURL;
-    link.download = "meme.png";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    const link = document.createElement("a")
+    link.href = dataURL
+    link.download = "meme.png"
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
   }
 
   return {
@@ -269,5 +255,5 @@ export function useFabric() {
     setCurrentBackgroundColor,
     deleteSelectedObject,
     downloadCanvas,
-  };
+  }
 }
