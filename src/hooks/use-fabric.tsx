@@ -1,232 +1,191 @@
 import React from "react"
 import { Canvas, FabricImage } from "fabric"
 import * as fabric from "fabric"
+import { useWindow } from "@/hooks/use-window"
+
+const CANVAS_DIMENSIONS = { default: 500, mobileMultiplier: 0.9 }
+const DEFAULT_BACKGROUND_COLOR = "#8d927b"
+const DEFAULT_TEXT_OPTIONS = {
+  text: "Your Text Here",
+  fontSize: 40,
+  fontFamily: "Impact",
+  fill: "white",
+  stroke: "black",
+  strokeWidth: 1.5,
+  textAlign: "center",
+}
 
 export function useFabric() {
-  const canvasRef = React.useRef<Canvas | null>(null)
-  const parentDivRef = React.useRef<HTMLDivElement | null>(null)
+  const canvasRef = React.useRef<HTMLCanvasElement>(null)
+  const [canvas, setCanvas] = React.useState<Canvas | null>(null)
   const [currentBackgroundColor, setCurrentBackgroundColor] =
-    React.useState<string>("#8d927b")
+    React.useState<string>(DEFAULT_BACKGROUND_COLOR)
 
-  const [canvasDimensions, setCanvasDimensions] = React.useState({
-    width: 500,
-    height: 500,
-  })
+  const { isMobile, windowSize } = useWindow()
 
   React.useEffect(() => {
-    const canvasElement = document.getElementById("canvas") as HTMLCanvasElement
+    if (!canvasRef.current) return
 
-    if (!canvasElement) {
-      console.log("Canvas element not found!")
-      return
-    }
-
-    const canvas = new Canvas(canvasElement, {
-      height: 500,
-      width: 500,
+    const fabricCanvas = new Canvas(canvasRef.current, {
+      width: CANVAS_DIMENSIONS.default,
+      height: CANVAS_DIMENSIONS.default,
     })
 
-    canvas.backgroundColor = currentBackgroundColor
-    canvas.renderAll()
+    setCanvas(fabricCanvas)
+    fabricCanvas.backgroundColor = currentBackgroundColor
 
-    canvasRef.current = canvas
+    adjustCanvasSize(fabricCanvas, isMobile) // Initial size adjustment
 
     return () => {
-      canvas.dispose()
+      fabricCanvas.dispose()
     }
   }, [])
 
-  async function setBackgroundImage(imageUrl: string): Promise<Canvas | null> {
-    const canvas = canvasRef.current
-    const parentDiv = parentDivRef.current
-
-    if (!canvas || !parentDiv) {
-      console.error("Canvas or parent div is not initialized")
-      return null
-    }
-
-    try {
-      const img = await FabricImage.fromURL(imageUrl)
-
-      if (!img) {
-        alert("Failed to load image")
-        return null
-      }
-
-      const aspectRatio = img.width! / img.height!
-      const newWidth = 500 * aspectRatio
-
-      parentDiv.style.width = `${newWidth}px`
-
-      canvas.setDimensions({ width: newWidth, height: 500 })
-
-      img.set({
-        scaleX: newWidth / img.width!,
-        scaleY: 500 / img.height!,
-        originX: "left",
-        originY: "top",
-        left: 0,
-        top: 0,
-        objectCaching: false,
-      })
-
-      canvas.backgroundImage = img
+  React.useEffect(() => {
+    if (canvas) {
+      adjustCanvasSize(canvas, isMobile) // Adjust size on window resize
       canvas.renderAll()
+    }
+  }, [isMobile, windowSize.width, windowSize.height])
 
-      setCanvasDimensions({
-        width: newWidth,
-        height: 500,
-      })
+  function adjustCanvasSize(fabricCanvas: Canvas, isMobile: boolean) {
+    const size = isMobile
+      ? Math.min(
+          windowSize.width! * CANVAS_DIMENSIONS.mobileMultiplier,
+          CANVAS_DIMENSIONS.default,
+        )
+      : CANVAS_DIMENSIONS.default
 
-      return canvas
-    } catch (error) {
-      console.error("Error setting background image:", error)
+    fabricCanvas.setDimensions({ width: size, height: size })
+  }
+
+  async function setBackgroundImage(imageUrl: string): Promise<Canvas | null> {
+    if (!canvas) return null
+
+    const img = await FabricImage.fromURL(imageUrl)
+    if (!img) {
+      alert("Failed to load image")
       return null
     }
-  }
 
-  function changeBackgroundColor(color: string) {
-    const canvas = canvasRef.current
+    if (windowSize.width! > 768) {
+      // Desktop: Adjust canvas width based on the image aspect ratio
+      const imgWidth = (img.width! * CANVAS_DIMENSIONS.default) / img.height!
+      canvas.setDimensions({
+        width: imgWidth,
+        height: CANVAS_DIMENSIONS.default,
+      })
+    } else {
+      // Mobile: Adjust canvas dimensions to remain square or constrained
+      const size = Math.min(
+        windowSize.width! * CANVAS_DIMENSIONS.mobileMultiplier,
 
-    if (!canvas) {
-      console.error("Canvas is not initialized")
-      return
+        CANVAS_DIMENSIONS.default,
+      )
+
+      canvas.setDimensions({ width: size, height: size })
     }
 
-    setCurrentBackgroundColor(color)
-    canvas.backgroundColor = color
+    // Scale the background image to cover the entire canvas
+    const canvasWidth = canvas.width!
+    const canvasHeight = canvas.height!
+    const scaleX = canvasWidth / img.width!
+    const scaleY = canvasHeight / img.height!
+    const scale = Math.max(scaleX, scaleY)
+
+    img.scale(scale)
+    img.set({
+      originX: "center",
+      originY: "center",
+      left: canvasWidth / 2,
+      top: canvasHeight / 2,
+      objectCaching: false,
+    })
+
+    canvas.backgroundImage = img
     canvas.renderAll()
+
+    return canvas
   }
 
-  async function addText() {
-    const canvas = canvasRef.current
+  function addText() {
+    if (!canvas) return
 
-    if (!canvas) {
-      console.error("Canvas is not initialized")
-      return
-    }
-
-    const memeText = new fabric.Textbox("Your Text Here", {
+    const text = new fabric.Textbox(DEFAULT_TEXT_OPTIONS.text, {
+      ...DEFAULT_TEXT_OPTIONS,
       left: canvas.getWidth() / 2,
       top: canvas.getHeight() / 2,
       width: canvas.getWidth() * 0.8,
-      fontSize: 40,
-      fontFamily: "Impact",
-      fill: "white",
-      stroke: "black",
-      strokeWidth: 1.5,
-      textAlign: "center",
       originX: "center",
       originY: "center",
-      editable: true,
     })
 
-    canvas.add(memeText)
-    canvas.setActiveObject(memeText)
+    canvas.add(text)
+    canvas.setActiveObject(text)
     canvas.renderAll()
   }
 
   async function addChillGuy() {
-    const canvas = canvasRef.current
-    if (!canvas) {
-      console.error("Canvas is not initialized")
+    if (!canvas) return
+
+    const imageUrl = `${process.env.NEXT_PUBLIC_APP_URL}/chillguy.png`
+    const img = await FabricImage.fromURL(imageUrl)
+
+    if (!img) {
+      console.error("Failed to load image")
       return
     }
 
-    const imageUrl = `${process.env.NEXT_PUBLIC_APP_URL}/chillguy.png`
+    const { width, height } = canvas
+    const scale = Math.min(
+      (width! * 0.5) / img.width!,
+      (height! * 0.5) / img.height!,
+    )
 
-    try {
-      const img = await FabricImage.fromURL(imageUrl)
+    img.set({
+      scaleX: scale,
+      scaleY: scale,
+      left: width! / 2,
+      top: height! / 2,
+      originX: "center",
+      originY: "center",
+      selectable: true,
+    })
 
-      if (!img) {
-        console.error("Failed to load image")
-        return
-      }
-
-      // Get canvas dimensions
-      const canvasWidth = canvas.getWidth()
-      const canvasHeight = canvas.getHeight()
-
-      // Scale the image to fit within the canvas (with padding)
-      const maxWidth = canvasWidth * 0.5
-      const maxHeight = canvasHeight * 0.5
-      const scaleX = maxWidth / img.width!
-      const scaleY = maxHeight / img.height!
-      const scale = Math.min(scaleX, scaleY)
-
-      img.set({
-        scaleX: scale,
-        scaleY: scale,
-        left: canvasWidth / 2,
-        top: canvasHeight / 2,
-        originX: "center",
-        originY: "center",
-        selectable: true,
-      })
-
-      canvas.add(img)
-      canvas.setActiveObject(img)
-      canvas.renderAll()
-
-      console.log("Image added to canvas in the center")
-    } catch (error) {
-      console.error("Error adding image to canvas:", error)
-    }
+    canvas.add(img)
+    canvas.setActiveObject(img)
+    canvas.renderAll()
   }
 
   function flipImage(direction: "horizontal" | "vertical") {
-    const canvas = canvasRef.current
-    if (!canvas) {
-      console.error("Canvas is not initialized")
-      return
-    }
+    if (!canvas) return
 
     const activeObject = canvas.getActiveObject()
+
     if (activeObject && activeObject.type === "image") {
       const image = activeObject as fabric.Image
+      direction === "horizontal"
+        ? image.set("flipX", !image.flipX)
+        : image.set("flipY", !image.flipY)
 
-      // Toggle flipX or flipY based on direction
-      if (direction === "horizontal") {
-        image.set("flipX", !image.flipX)
-      } else if (direction === "vertical") {
-        image.set("flipY", !image.flipY)
-      }
-
-      // Re-render the canvas
       canvas.renderAll()
-
-      console.log(`Image flipped ${direction}`)
-    } else {
-      console.warn("No image object selected to flip")
     }
   }
 
   function deleteSelectedObject() {
-    const canvas = canvasRef.current
-    if (!canvas) {
-      console.error("Canvas is not initialized")
-      return
-    }
+    if (!canvas) return
 
     const activeObject = canvas.getActiveObject()
 
     if (activeObject) {
-      // If an object is selected
       canvas.remove(activeObject)
       canvas.discardActiveObject()
       canvas.renderAll()
-      console.log("Selected object deleted")
-    } else {
-      console.warn("No object selected to delete")
     }
   }
 
   function downloadCanvas() {
-    const canvas = canvasRef.current
-    if (!canvas) {
-      console.error("Canvas is not initialized")
-      return
-    }
+    if (!canvas) return
 
     const dataURL = canvas.toDataURL({
       format: "png",
@@ -242,17 +201,22 @@ export function useFabric() {
     document.body.removeChild(link)
   }
 
+  function changeBackgroundColor(color: string) {
+    if (canvas) {
+      setCurrentBackgroundColor(color)
+      canvas.backgroundColor = color
+      canvas.renderAll()
+    }
+  }
+
   return {
     canvasRef,
-    parentDivRef,
-    canvasDimensions,
     setBackgroundImage,
     addText,
     addChillGuy,
     flipImage,
     changeBackgroundColor,
     currentBackgroundColor,
-    setCurrentBackgroundColor,
     deleteSelectedObject,
     downloadCanvas,
   }
