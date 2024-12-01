@@ -48,6 +48,27 @@ export function useFabric() {
     }
   }, [isMobile, windowSize.width, windowSize.height])
 
+  React.useEffect(() => {
+    if (!canvas) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (
+        (event.key === "Delete" || event.key === "Backspace") &&
+        canvas.getActiveObject()
+      ) {
+        deleteSelectedObject();
+      }
+    };
+
+    // Add event listener to the window
+    window.addEventListener("keydown", handleKeyDown);
+
+    // Cleanup function to remove event listener
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [canvas, deleteSelectedObject]);
+
   function adjustCanvasSize(fabricCanvas: Canvas, isMobile: boolean) {
     const size = isMobile
       ? Math.min(
