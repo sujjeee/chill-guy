@@ -11,6 +11,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { HexColorPicker } from "react-colorful"
+import { useWindow } from "@/hooks/use-window"
 
 interface ToolbarProps {
   setBackgroundImage: (imageUrl: string) => Promise<Canvas | null>
@@ -55,10 +56,12 @@ export function Toolbar({
     maxFiles: 1,
   })
 
+  const { isMobile } = useWindow()
+
   return (
     <div className="max-w-[100vw] px-5">
       <div className="no-scrollbar w-full overflow-x-auto rounded-full border bg-white sm:overflow-visible">
-        <div className="flex items-center space-x-2 p-2  text-2xl md:justify-center">
+        <div className="flex items-center space-x-2 p-2 text-2xl md:justify-center">
           <Button
             {...getRootProps()}
             variant="outline"
@@ -152,6 +155,11 @@ export function Toolbar({
             <span className="tooltiptext">Download</span>
             <Icons.download className="size-4" />
           </Button>
+          {isMobile && (
+            <div className="h-5 invisible">
+              <div className="h-full w-px bg-[#e5e5e5]"></div>
+            </div>
+          )}
         </div>
       </div>
     </div>
