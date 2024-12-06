@@ -2,6 +2,7 @@
 
 import { Toolbar } from "@/components/toolbar"
 import { useFabric } from "@/hooks/use-fabric"
+import { recommendedFonts, otherFonts } from "@/lib/constants"
 
 export default function HomePage() {
   const {
@@ -9,15 +10,26 @@ export default function HomePage() {
     setBackgroundImage,
     addText,
     addChillGuy,
+    changeFontFamily,
+    changeTextColor,
     flipImage,
     deleteSelectedObject,
     downloadCanvas,
     changeBackgroundColor,
     currentBackgroundColor,
+    selectedTextProperties,
   } = useFabric()
 
   return (
     <>
+      <style jsx global>{`
+        @import url("https://fonts.googleapis.com/css2?family=${[
+          ...recommendedFonts,
+          ...otherFonts,
+        ]
+          .map((font) => font.replace(/\s+/g, "+"))
+          .join("&family=")}&display=swap");
+      `}</style>
       <div className="px-2 space-y-10 min-h-screen items-center h-full flex-col flex justify-between">
         <div></div>
         <canvas
@@ -29,11 +41,14 @@ export default function HomePage() {
             setBackgroundImage={setBackgroundImage}
             addText={addText}
             addChillGuy={addChillGuy}
+            changeFontFamily={changeFontFamily}
+            changeTextColor={changeTextColor}
             flipImage={flipImage}
             deleteSelectedObject={deleteSelectedObject}
             downloadCanvas={downloadCanvas}
             changeBackgroundColor={changeBackgroundColor}
             currentBackgroundColor={currentBackgroundColor}
+            selectedTextProperties={selectedTextProperties}
           />
           <div className="flex flex-col justify-center text-center items-center text-sm md:flex-row">
             <a

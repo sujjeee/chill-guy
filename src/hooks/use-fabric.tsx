@@ -5,14 +5,22 @@ import { useWindow } from "@/hooks/use-window"
 
 const CANVAS_DIMENSIONS = { default: 500, mobileMultiplier: 0.9 }
 const DEFAULT_BACKGROUND_COLOR = "#8d927b"
+const DEFAULT_FONT_COLOR = "#000000"
+const DEFAULT_FONT_FAMILY = "Impact"
 const DEFAULT_TEXT_OPTIONS = {
   text: "Your Text Here",
   fontSize: 40,
-  fontFamily: "Impact",
-  fill: "white",
-  stroke: "black",
-  strokeWidth: 1.5,
+  fontFamily: DEFAULT_FONT_FAMILY,
+  fill: DEFAULT_FONT_COLOR,
+  // stroke: "black",
+  // strokeWidth: 1.5,
   textAlign: "center",
+}
+
+export interface selectedTextPropertiesProps {
+  fontFamily: string
+  fontColor: string
+  isTextSelected: boolean
 }
 
 export function useFabric() {
@@ -20,6 +28,12 @@ export function useFabric() {
   const [canvas, setCanvas] = React.useState<Canvas | null>(null)
   const [currentBackgroundColor, setCurrentBackgroundColor] =
     React.useState<string>(DEFAULT_BACKGROUND_COLOR)
+  const [selectedTextProperties, setSelectedTextProperties] =
+    React.useState<selectedTextPropertiesProps>({
+      fontFamily: DEFAULT_FONT_FAMILY,
+      fontColor: DEFAULT_FONT_COLOR,
+      isTextSelected: false,
+    })
 
   const { isMobile, windowSize } = useWindow()
 
@@ -34,9 +48,75 @@ export function useFabric() {
     setCanvas(fabricCanvas)
     fabricCanvas.backgroundColor = currentBackgroundColor
 
+    // Add a listener for when an object is added to the canvas
+    fabricCanvas.on("object:added", (e) => {
+      const object = e.target
+      if (object) {
+        object.set({
+          cornerColor: "#FFF",
+          cornerStyle: "circle",
+          borderColor: "#8a4fec",
+          borderScaleFactor: 1.5,
+          transparentCorners: false,
+          borderOpacityWhenMoving: 1,
+          cornerStrokeColor: "#8a4fec",
+        })
+
+        // TODO: MAKE IT MORE LIKE CANVA SELECTOR
+
+        // Define custom controls
+        // object.controls = {
+        //   ...object.controls,
+        //   mtr: new fabric.Control({
+        //     x: 0,
+        //     y: -0.58,
+        //     offsetY: -30,
+        //     cursorStyle: "grab",
+        //     actionName: "rotate",
+        //     actionHandler: fabric.controlsUtils.rotationWithSnapping,
+        //   }),
+        // }
+
+        fabricCanvas.renderAll()
+      }
+    })
+
+    // Add listeners for object selection and deselection
+
+    const updateSelectedTextProperties = () => {
+      const activeObject = fabricCanvas.getActiveObject()
+
+      if (activeObject && activeObject.type === "textbox") {
+        setSelectedTextProperties({
+          fontFamily: activeObject.get("fontFamily") as string,
+          fontColor: activeObject.get("fill") as string,
+          isTextSelected: true,
+        })
+      } else {
+        setSelectedTextProperties({
+          fontFamily: DEFAULT_FONT_FAMILY,
+          fontColor: DEFAULT_FONT_COLOR,
+          isTextSelected: false,
+        })
+      }
+    }
+
+    // Listen to multiple events that might change selection
+    fabricCanvas.on("selection:created", updateSelectedTextProperties)
+    fabricCanvas.on("selection:updated", updateSelectedTextProperties)
+    fabricCanvas.on("selection:cleared", updateSelectedTextProperties)
+
+    // Add a listener for object modifications
+    fabricCanvas.on("object:modified", updateSelectedTextProperties)
+
     adjustCanvasSize(fabricCanvas, isMobile) // Initial size adjustment
 
     return () => {
+      // Remove event listeners
+      fabricCanvas.off("selection:created", updateSelectedTextProperties)
+      fabricCanvas.off("selection:updated", updateSelectedTextProperties)
+      fabricCanvas.off("selection:cleared", updateSelectedTextProperties)
+      fabricCanvas.off("object:modified", updateSelectedTextProperties)
       fabricCanvas.dispose()
     }
   }, [])
@@ -49,25 +129,25 @@ export function useFabric() {
   }, [isMobile, windowSize.width, windowSize.height])
 
   React.useEffect(() => {
-    if (!canvas) return;
+    if (!canvas) return
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (
         (event.key === "Delete" || event.key === "Backspace") &&
         canvas.getActiveObject()
       ) {
-        deleteSelectedObject();
+        deleteSelectedObject()
       }
-    };
+    }
 
     // Add event listener to the window
-    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown)
 
     // Cleanup function to remove event listener
     return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [canvas, deleteSelectedObject]);
+      window.removeEventListener("keydown", handleKeyDown)
+    }
+  }, [canvas, deleteSelectedObject])
 
   function adjustCanvasSize(fabricCanvas: Canvas, isMobile: boolean) {
     const size = isMobile
@@ -144,6 +224,42 @@ export function useFabric() {
     canvas.add(text)
     canvas.setActiveObject(text)
     canvas.renderAll()
+  }
+
+  function changeFontFamily(fontFamily: string) {
+    if (!canvas) return
+
+    const activeObject = canvas.getActiveObject()
+    if (activeObject && activeObject.type === "textbox") {
+      const text = activeObject as fabric.Textbox
+      text.set("fontFamily", fontFamily)
+
+      // Immediately update the selected text properties
+      setSelectedTextProperties((prev) => ({
+        ...prev,
+        fontFamily: fontFamily,
+      }))
+
+      canvas.renderAll()
+    }
+  }
+
+  function changeTextColor(color: string) {
+    if (!canvas) return
+
+    const activeObject = canvas.getActiveObject()
+    if (activeObject && activeObject.type === "textbox") {
+      const text = activeObject as fabric.Textbox
+      text.set("fill", color)
+
+      // Immediately update the selected text properties
+      setSelectedTextProperties((prev) => ({
+        ...prev,
+        fontColor: color,
+      }))
+
+      canvas.renderAll()
+    }
   }
 
   async function addChillGuy() {
@@ -235,10 +351,13 @@ export function useFabric() {
     setBackgroundImage,
     addText,
     addChillGuy,
+    changeFontFamily,
+    changeTextColor,
     flipImage,
     changeBackgroundColor,
     currentBackgroundColor,
     deleteSelectedObject,
     downloadCanvas,
+    selectedTextProperties,
   }
 }
