@@ -132,10 +132,7 @@ export function useFabric() {
     if (!canvas) return
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (
-        (event.key === "Delete" || event.key === "Backspace") &&
-        canvas.getActiveObject()
-      ) {
+      if (event.key === "Delete" && canvas.getActiveObject()) {
         deleteSelectedObject()
       }
     }
