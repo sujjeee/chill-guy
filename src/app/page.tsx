@@ -2,7 +2,6 @@
 
 import { Toolbar } from "@/components/toolbar"
 import { useFabric } from "@/hooks/use-fabric"
-import { recommendedFonts, otherFonts } from "@/lib/constants"
 
 export default function HomePage() {
   const {
@@ -22,14 +21,6 @@ export default function HomePage() {
 
   return (
     <>
-      <style jsx global>{`
-        @import url("https://fonts.googleapis.com/css2?family=${[
-          ...recommendedFonts,
-          ...otherFonts,
-        ]
-          .map((font) => font.replace(/\s+/g, "+"))
-          .join("&family=")}&display=swap");
-      `}</style>
       <div className="px-2 space-y-10 min-h-screen items-center h-full flex-col flex justify-between">
         <div></div>
         <canvas
