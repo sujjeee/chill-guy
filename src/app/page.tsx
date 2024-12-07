@@ -2,6 +2,7 @@
 
 import { Toolbar } from "@/components/toolbar"
 import { useFabric } from "@/hooks/use-fabric"
+import "@/app/fonts.css"
 
 export default function HomePage() {
   const {
