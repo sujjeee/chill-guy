@@ -40,6 +40,7 @@ interface ToolbarProps {
   currentBackgroundColor: string
   selectedTextProperties: selectedTextPropertiesProps
   toggleFilter: () => void
+  isImageSelected: boolean
 }
 
 export function Toolbar({
@@ -55,6 +56,7 @@ export function Toolbar({
   currentBackgroundColor,
   selectedTextProperties,
   toggleFilter,
+  isImageSelected,
 }: ToolbarProps) {
   const onDrop = React.useCallback(
     (acceptedFiles: File[]) => {
@@ -133,25 +135,41 @@ export function Toolbar({
               className="size-6"
             />
           </Button>
-          <Button
-            onClick={() => flipImage("horizontal")}
-            variant="outline"
-            size={"icon"}
-            className="rounded-full hover:animate-jelly tooltip shrink-0"
-          >
-            <span className="tooltiptext">Flip</span>
-            <Icons.flip className="size-4" />
-          </Button>
-          <Button
-            onClick={() => toggleFilter()}
-            variant="outline"
-            size={"icon"}
-            className="rounded-full hover:animate-jelly tooltip shrink-0 "
-          >
-            <Icons.filters className="size-4" />
-            <span className="tooltiptext">Filters</span>
-          </Button>
-
+          <AnimatePresence>
+            {isImageSelected && (
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20, transition: { duration: 0.09 } }}
+                transition={{
+                  duration: 0.1,
+                  stiffness: 900,
+                  type: "spring",
+                  damping: 50,
+                }}
+                className="flex items-center space-x-2"
+              >
+                <Button
+                  onClick={() => flipImage("horizontal")}
+                  variant="outline"
+                  size={"icon"}
+                  className="rounded-full hover:animate-jelly tooltip shrink-0"
+                >
+                  <span className="tooltiptext">Flip</span>
+                  <Icons.flip className="size-4" />
+                </Button>
+                <Button
+                  onClick={() => toggleFilter()}
+                  variant="outline"
+                  size={"icon"}
+                  className="rounded-full hover:animate-jelly tooltip shrink-0 "
+                >
+                  <Icons.filters className="size-4" />
+                  <span className="tooltiptext">Filters</span>
+                </Button>
+              </motion.div>
+            )}
+          </AnimatePresence>
           <div className="h-5">
             <div className="mx-1.5 h-full w-px bg-[#e5e5e5]"></div>
           </div>

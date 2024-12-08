@@ -35,7 +35,7 @@ export function useFabric() {
       fontColor: DEFAULT_FONT_COLOR,
       isTextSelected: false,
     })
-
+  const [isImageSelected, setIsImageSelected] = React.useState<boolean>(false)
   const [currentFilterIndex, setCurrentFilterIndex] = React.useState<number>(0)
   const { isMobile, windowSize } = useWindow()
 
@@ -99,6 +99,13 @@ export function useFabric() {
           fontColor: DEFAULT_FONT_COLOR,
           isTextSelected: false,
         })
+      }
+
+      // Update image selection state
+      if (activeObject && activeObject.type === "image") {
+        setIsImageSelected(true)
+      } else {
+        setIsImageSelected(false)
       }
     }
 
@@ -382,5 +389,6 @@ export function useFabric() {
     downloadCanvas,
     selectedTextProperties,
     toggleFilter,
+    isImageSelected,
   }
 }
