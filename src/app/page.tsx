@@ -18,6 +18,7 @@ export default function HomePage() {
     changeBackgroundColor,
     currentBackgroundColor,
     selectedTextProperties,
+    toggleFilter,
   } = useFabric()
 
   return (
@@ -41,6 +42,7 @@ export default function HomePage() {
             changeBackgroundColor={changeBackgroundColor}
             currentBackgroundColor={currentBackgroundColor}
             selectedTextProperties={selectedTextProperties}
+            toggleFilter={toggleFilter}
           />
           <div className="flex flex-col justify-center text-center items-center text-sm md:flex-row">
             <a

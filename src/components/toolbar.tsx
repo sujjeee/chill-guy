@@ -25,7 +25,6 @@ import { otherFonts, recommendedFonts } from "@/lib/constants"
 import { CheckIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { selectedTextPropertiesProps } from "@/hooks/use-fabric"
-
 import { AnimatePresence, motion } from "framer-motion"
 
 interface ToolbarProps {
@@ -40,6 +39,7 @@ interface ToolbarProps {
   changeBackgroundColor: (color: string) => void
   currentBackgroundColor: string
   selectedTextProperties: selectedTextPropertiesProps
+  toggleFilter: () => void
 }
 
 export function Toolbar({
@@ -54,6 +54,7 @@ export function Toolbar({
   changeBackgroundColor,
   currentBackgroundColor,
   selectedTextProperties,
+  toggleFilter,
 }: ToolbarProps) {
   const onDrop = React.useCallback(
     (acceptedFiles: File[]) => {
@@ -141,6 +142,16 @@ export function Toolbar({
             <span className="tooltiptext">Flip</span>
             <Icons.flip className="size-4" />
           </Button>
+          <Button
+            onClick={() => toggleFilter()}
+            variant="outline"
+            size={"icon"}
+            className="rounded-full hover:animate-jelly tooltip shrink-0 "
+          >
+            <Icons.filters className="size-4" />
+            <span className="tooltiptext">Filters</span>
+          </Button>
+
           <div className="h-5">
             <div className="mx-1.5 h-full w-px bg-[#e5e5e5]"></div>
           </div>
@@ -183,7 +194,7 @@ export function Toolbar({
                     className="max-w-[200px] w-full p-0 h-[250px] rounded-lg"
                   >
                     <Command>
-                      <CommandInput placeholder="Search font family..." />
+                      <CommandInput placeholder="Search font family" />
                       <CommandList className="hide_scrollbar">
                         <CommandEmpty>No font family found.</CommandEmpty>
                         <CommandGroup heading="Recommended">

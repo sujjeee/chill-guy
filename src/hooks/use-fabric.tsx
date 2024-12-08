@@ -2,6 +2,7 @@ import React from "react"
 import { Canvas, FabricImage } from "fabric"
 import * as fabric from "fabric"
 import { useWindow } from "@/hooks/use-window"
+import { filterNames, getFilter } from "@/lib/constants"
 
 const CANVAS_DIMENSIONS = { default: 500, mobileMultiplier: 0.9 }
 const DEFAULT_BACKGROUND_COLOR = "#8d927b"
@@ -35,6 +36,7 @@ export function useFabric() {
       isTextSelected: false,
     })
 
+  const [currentFilterIndex, setCurrentFilterIndex] = React.useState<number>(0)
   const { isMobile, windowSize } = useWindow()
 
   React.useEffect(() => {
@@ -82,8 +84,7 @@ export function useFabric() {
     })
 
     // Add listeners for object selection and deselection
-
-    const updateSelectedTextProperties = () => {
+    const updateSelectedProperties = () => {
       const activeObject = fabricCanvas.getActiveObject()
 
       if (activeObject && activeObject.type === "textbox") {
@@ -102,21 +103,21 @@ export function useFabric() {
     }
 
     // Listen to multiple events that might change selection
-    fabricCanvas.on("selection:created", updateSelectedTextProperties)
-    fabricCanvas.on("selection:updated", updateSelectedTextProperties)
-    fabricCanvas.on("selection:cleared", updateSelectedTextProperties)
+    fabricCanvas.on("selection:created", updateSelectedProperties)
+    fabricCanvas.on("selection:updated", updateSelectedProperties)
+    fabricCanvas.on("selection:cleared", updateSelectedProperties)
 
     // Add a listener for object modifications
-    fabricCanvas.on("object:modified", updateSelectedTextProperties)
+    fabricCanvas.on("object:modified", updateSelectedProperties)
 
     adjustCanvasSize(fabricCanvas, isMobile) // Initial size adjustment
 
     return () => {
       // Remove event listeners
-      fabricCanvas.off("selection:created", updateSelectedTextProperties)
-      fabricCanvas.off("selection:updated", updateSelectedTextProperties)
-      fabricCanvas.off("selection:cleared", updateSelectedTextProperties)
-      fabricCanvas.off("object:modified", updateSelectedTextProperties)
+      fabricCanvas.off("selection:created", updateSelectedProperties)
+      fabricCanvas.off("selection:updated", updateSelectedProperties)
+      fabricCanvas.off("selection:cleared", updateSelectedProperties)
+      fabricCanvas.off("object:modified", updateSelectedProperties)
       fabricCanvas.dispose()
     }
   }, [])
@@ -161,6 +162,7 @@ export function useFabric() {
     if (!canvas) return null
 
     const img = await FabricImage.fromURL(imageUrl)
+
     if (!img) {
       alert("Failed to load image")
       return null
@@ -169,6 +171,7 @@ export function useFabric() {
     if (windowSize.width! > 768) {
       // Desktop: Adjust canvas width based on the image aspect ratio
       const imgWidth = (img.width! * CANVAS_DIMENSIONS.default) / img.height!
+
       canvas.setDimensions({
         width: imgWidth,
         height: CANVAS_DIMENSIONS.default,
@@ -306,6 +309,28 @@ export function useFabric() {
     }
   }
 
+  function toggleFilter() {
+    // Move to the next filter in the list
+    const nextIndex = (currentFilterIndex + 1) % filterNames.length
+    setCurrentFilterIndex(nextIndex)
+
+    // Determine the next filter
+    const nextFilter = filterNames[nextIndex]
+
+    if (!canvas) return
+
+    const activeObject = canvas.getActiveObject()
+    if (activeObject && activeObject.type === "image") {
+      const image = activeObject as FabricImage
+      const filter = getFilter(nextFilter)
+
+      image.filters = filter ? [filter] : []
+      image.applyFilters()
+      ;(image as any).filterName = nextFilter
+      canvas.renderAll()
+    }
+  }
+
   function deleteSelectedObject() {
     if (!canvas) return
 
@@ -356,5 +381,6 @@ export function useFabric() {
     deleteSelectedObject,
     downloadCanvas,
     selectedTextProperties,
+    toggleFilter,
   }
 }

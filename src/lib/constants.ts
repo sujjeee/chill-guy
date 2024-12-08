@@ -1,3 +1,5 @@
+import { filters } from "fabric"
+
 export const recommendedFonts = [
   "Impact",
   "Comic Sans MS",
@@ -214,3 +216,113 @@ export const otherFonts = [
   "Zeyada",
   "Zilla Slab",
 ]
+
+export const filterNames = [
+  null,
+  "greyscale",
+  "polaroid",
+  "sepia",
+  "kodachrome",
+  "contrast",
+  "brightness",
+  "brownie",
+  "vintage",
+  "technicolor",
+  "pixelate",
+  "invert",
+  "blur",
+  "convolute",
+  "removecolor",
+  "blacknwhite",
+  "vibrance",
+  "blendcolor",
+  "huerotate",
+  "resize",
+  "gamma",
+  "saturation",
+]
+
+export function getFilter(name: string | null) {
+  const {
+    Grayscale,
+    Polaroid,
+    Sepia,
+    Kodachrome,
+    Contrast,
+    Brightness,
+    Brownie,
+    Vintage,
+    Technicolor,
+    Pixelate,
+    Invert,
+    Blur,
+    Convolute,
+    RemoveColor,
+    BlackWhite,
+    Vibrance,
+    BlendColor,
+    HueRotation,
+    Resize,
+    Gamma,
+    Saturation,
+  } = filters
+
+  switch (name) {
+    case "greyscale":
+      return new Grayscale()
+    case "polaroid":
+      return new Polaroid()
+    case "sepia":
+      return new Sepia()
+    case "kodachrome":
+      return new Kodachrome()
+    case "contrast":
+      return new Contrast({ contrast: 0.3 })
+    case "brightness":
+      return new Brightness({ brightness: 0.8 })
+    case "brownie":
+      return new Brownie()
+    case "vintage":
+      return new Vintage()
+    case "technicolor":
+      return new Technicolor()
+    case "pixelate":
+      return new Pixelate()
+    case "invert":
+      return new Invert()
+    case "blur":
+      return new Blur()
+    case "sharpen":
+      return new Convolute({
+        matrix: [0, -1, 0, -1, 5, -1, 0, -1, 0],
+      })
+    case "emboss":
+      return new Convolute({
+        matrix: [1, 1, 1, 1, 0.7, -1, -1, -1, -1],
+      })
+    case "removecolor":
+      return new RemoveColor({
+        threshold: 0.2,
+        distance: 0.5,
+      })
+    case "blacknwhite":
+      return new BlackWhite()
+    case "vibrance":
+      return new Vibrance({ vibrance: 1 })
+    case "blendcolor":
+      return new BlendColor({
+        color: "#00ff00",
+        mode: "multiply",
+      })
+    case "huerotate":
+      return new HueRotation({ rotation: 0.5 })
+    case "resize":
+      return new Resize()
+    case "gamma":
+      return new Gamma({ gamma: [1, 0.5, 2.1] })
+    case "saturation":
+      return new Saturation({ saturation: 0.7 })
+    default:
+      return null
+  }
+}
