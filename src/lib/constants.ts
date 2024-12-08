@@ -230,15 +230,12 @@ export const filterNames = [
   "technicolor",
   "pixelate",
   "invert",
-  "blur",
   "convolute",
   "removecolor",
   "blacknwhite",
   "vibrance",
   "blendcolor",
   "huerotate",
-  "resize",
-  "gamma",
   "saturation",
 ]
 
@@ -255,15 +252,12 @@ export function getFilter(name: string | null) {
     Technicolor,
     Pixelate,
     Invert,
-    Blur,
     Convolute,
     RemoveColor,
     BlackWhite,
     Vibrance,
     BlendColor,
     HueRotation,
-    Resize,
-    Gamma,
     Saturation,
   } = filters
 
@@ -290,8 +284,6 @@ export function getFilter(name: string | null) {
       return new Pixelate()
     case "invert":
       return new Invert()
-    case "blur":
-      return new Blur()
     case "sharpen":
       return new Convolute({
         matrix: [0, -1, 0, -1, 5, -1, 0, -1, 0],
@@ -316,10 +308,6 @@ export function getFilter(name: string | null) {
       })
     case "huerotate":
       return new HueRotation({ rotation: 0.5 })
-    case "resize":
-      return new Resize()
-    case "gamma":
-      return new Gamma({ gamma: [1, 0.5, 2.1] })
     case "saturation":
       return new Saturation({ saturation: 0.7 })
     default:
