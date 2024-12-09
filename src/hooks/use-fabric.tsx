@@ -1,5 +1,6 @@
 import React from "react"
 import { Canvas, FabricImage } from "fabric"
+import jsPDF from 'jspdf';
 import * as fabric from "fabric"
 import { useWindow } from "@/hooks/use-window"
 import { filterNames, getFilter } from "@/lib/constants"
@@ -367,6 +368,44 @@ export function useFabric() {
     document.body.removeChild(link)
   }
 
+  function downloadPDF() {
+    if (!canvasRef.current) return;
+
+    const canvas = canvasRef.current;
+    
+    // Create a temporary high-resolution canvas
+    const tempCanvas = document.createElement('canvas');
+    const tempCtx = tempCanvas.getContext('2d');
+    if (!tempCtx) return;
+
+    // Set the temporary canvas to 2x the original size for higher quality
+    const scale = 2;
+    tempCanvas.width = canvas.width * scale;
+    tempCanvas.height = canvas.height * scale;
+
+    // Scale and draw the original canvas onto the temporary canvas
+    tempCtx.scale(scale, scale);
+    tempCtx.drawImage(canvas, 0, 0);
+
+    // Get the high-quality image data
+    const imgData = tempCanvas.toDataURL('image/jpeg', 1.0);
+
+    // Create a new jsPDF instance with the same aspect ratio as the canvas
+    const pdf = new jsPDF({
+      orientation: canvas.width > canvas.height ? 'landscape' : 'portrait',
+      unit: 'px',
+      format: [canvas.width, canvas.height]
+    });
+
+    // Add the high-quality image to the PDF
+    pdf.addImage(imgData, 'JPEG', 0, 0, canvas.width, canvas.height, '', 'FAST');
+
+    // Save the PDF with better compression
+    pdf.save("meme.pdf", { compress: false });
+  }
+
+  
+
   function changeBackgroundColor(color: string) {
     if (canvas) {
       setCurrentBackgroundColor(color)
@@ -387,6 +426,7 @@ export function useFabric() {
     currentBackgroundColor,
     deleteSelectedObject,
     downloadCanvas,
+    downloadPDF,
     selectedTextProperties,
     toggleFilter,
     isImageSelected,
