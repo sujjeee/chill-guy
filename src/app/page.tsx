@@ -15,6 +15,7 @@ export default function HomePage() {
     flipImage,
     deleteSelectedObject,
     downloadCanvas,
+    downloadPDF,
     changeBackgroundColor,
     currentBackgroundColor,
     selectedTextProperties,
@@ -40,6 +41,7 @@ export default function HomePage() {
             flipImage={flipImage}
             deleteSelectedObject={deleteSelectedObject}
             downloadCanvas={downloadCanvas}
+            downloadPDF={downloadPDF}
             changeBackgroundColor={changeBackgroundColor}
             currentBackgroundColor={currentBackgroundColor}
             selectedTextProperties={selectedTextProperties}

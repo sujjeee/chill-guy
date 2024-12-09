@@ -36,6 +36,7 @@ interface ToolbarProps {
   flipImage: (direction: "horizontal" | "vertical") => void
   deleteSelectedObject: () => void
   downloadCanvas: () => void
+  downloadPDF: () => void
   changeBackgroundColor: (color: string) => void
   currentBackgroundColor: string
   selectedTextProperties: selectedTextPropertiesProps
@@ -52,6 +53,7 @@ export function Toolbar({
   flipImage,
   deleteSelectedObject,
   downloadCanvas,
+  downloadPDF,
   changeBackgroundColor,
   currentBackgroundColor,
   selectedTextProperties,
@@ -334,8 +336,20 @@ export function Toolbar({
             size={"icon"}
             className="rounded-full hover:animate-jelly tooltip shrink-0"
           >
-            <span className="tooltiptext">Download</span>
+            <span className="tooltiptext">Download Image</span>
             <Icons.download className="size-4" />
+          </Button>
+          <div className="h-5">
+            <div className="mx-1.5 h-full w-px bg-[#e5e5e5]"></div>
+          </div>
+          <Button
+            onClick={downloadPDF}
+            variant="outline"
+            size={"icon"}
+            className="rounded-full hover:animate-jelly tooltip shrink-0"
+          >
+            <span className="tooltiptext">Download PDF</span>
+            <Icons.pdf className="size-4" />
           </Button>
           {isMobile && (
             <div className="h-5 invisible">
