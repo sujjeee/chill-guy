@@ -20,6 +20,10 @@ export default function HomePage() {
     selectedTextProperties,
     toggleFilter,
     isImageSelected,
+    toggleDrawingMode,
+    incrementBrushSize,
+    setBrushColor,
+    drawingSettings,
   } = useFabric()
 
   return (
@@ -45,6 +49,10 @@ export default function HomePage() {
             selectedTextProperties={selectedTextProperties}
             toggleFilter={toggleFilter}
             isImageSelected={isImageSelected}
+            toggleDrawingMode={toggleDrawingMode}
+            drawingSettings={drawingSettings}
+            incrementBrushSize={incrementBrushSize}
+            setBrushColor={setBrushColor}
           />
           <div className="flex flex-col justify-center text-center items-center text-sm md:flex-row">
             <a

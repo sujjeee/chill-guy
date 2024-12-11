@@ -24,7 +24,10 @@ import {
 import { otherFonts, recommendedFonts } from "@/lib/constants"
 import { CheckIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { selectedTextPropertiesProps } from "@/hooks/use-fabric"
+import {
+  DrawingPropertiesProps,
+  selectedTextPropertiesProps,
+} from "@/hooks/use-fabric"
 import { AnimatePresence, motion } from "framer-motion"
 
 interface ToolbarProps {
@@ -41,6 +44,10 @@ interface ToolbarProps {
   selectedTextProperties: selectedTextPropertiesProps
   toggleFilter: () => void
   isImageSelected: boolean
+  toggleDrawingMode: () => void
+  incrementBrushSize: () => void
+  setBrushColor: (color: string) => void
+  drawingSettings: DrawingPropertiesProps
 }
 
 export function Toolbar({
@@ -57,6 +64,10 @@ export function Toolbar({
   selectedTextProperties,
   toggleFilter,
   isImageSelected,
+  toggleDrawingMode,
+  incrementBrushSize,
+  setBrushColor,
+  drawingSettings,
 }: ToolbarProps) {
   const onDrop = React.useCallback(
     (acceptedFiles: File[]) => {
@@ -306,6 +317,72 @@ export function Toolbar({
                       color={selectedTextProperties.fontColor}
                       onChange={(color: string) => {
                         return changeTextColor(color)
+                      }}
+                    />
+                  </PopoverContent>
+                </Popover>
+              </motion.div>
+            )}
+          </AnimatePresence>
+          <div className="h-5">
+            <div className="mx-1.5 h-full w-px bg-[#e5e5e5]"></div>
+          </div>
+          <Button
+            onClick={toggleDrawingMode}
+            variant="outline"
+            size="icon"
+            className={cn(
+              "rounded-full hover:animate-jelly tooltip shrink-0",
+              drawingSettings.isDrawing &&
+                "ring-2 ring-green-500 ring-offset-2",
+            )}
+          >
+            <span className="tooltiptext">Draw</span>
+            <Icons.draw className="size-4 " />
+          </Button>
+          <AnimatePresence>
+            {drawingSettings.isDrawing && (
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20, transition: { duration: 0.09 } }}
+                transition={{
+                  duration: 0.1,
+                  stiffness: 900,
+                  type: "spring",
+                  damping: 50,
+                }}
+                className="flex items-center space-x-2"
+              >
+                <Button
+                  onClick={incrementBrushSize}
+                  variant="outline"
+                  size="icon"
+                  className="rounded-full hover:animate-jelly tooltip shrink-0"
+                >
+                  <span className="tooltiptext">Brush Size</span>
+                  {drawingSettings.brushSize}
+                </Button>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size={"icon"}
+                      className="rounded-full hover:animate-jelly tooltip shrink-0 "
+                      style={{ backgroundColor: drawingSettings.brushColor }}
+                    >
+                      <span className="tooltiptext">Brush Color</span>
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent
+                    className="mt-3 w-fit p-0 bg-transparent rounded-lg"
+                    align="start"
+                  >
+                    <HexColorPicker
+                      className="border-none"
+                      color={drawingSettings.brushColor}
+                      onChange={(color: string) => {
+                        return setBrushColor(color)
                       }}
                     />
                   </PopoverContent>

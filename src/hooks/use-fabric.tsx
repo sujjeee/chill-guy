@@ -1,5 +1,5 @@
 import React from "react"
-import { Canvas, FabricImage } from "fabric"
+import { Canvas, FabricImage, PencilBrush } from "fabric"
 import * as fabric from "fabric"
 import { useWindow } from "@/hooks/use-window"
 import { filterNames, getFilter } from "@/lib/constants"
@@ -24,6 +24,12 @@ export interface selectedTextPropertiesProps {
   isTextSelected: boolean
 }
 
+export interface DrawingPropertiesProps {
+  isDrawing: boolean
+  brushSize: number
+  brushColor: string
+}
+
 export function useFabric() {
   const canvasRef = React.useRef<HTMLCanvasElement>(null)
   const [canvas, setCanvas] = React.useState<Canvas | null>(null)
@@ -38,6 +44,12 @@ export function useFabric() {
   const [isImageSelected, setIsImageSelected] = React.useState<boolean>(false)
   const [currentFilterIndex, setCurrentFilterIndex] = React.useState<number>(0)
   const { isMobile, windowSize } = useWindow()
+  const [drawingSettings, setDrawingSettings] =
+    React.useState<DrawingPropertiesProps>({
+      isDrawing: false,
+      brushSize: 4,
+      brushColor: "#000000",
+    })
 
   React.useEffect(() => {
     if (!canvasRef.current) return
@@ -109,6 +121,11 @@ export function useFabric() {
       }
     }
 
+    // Load the brush for drawing
+    fabricCanvas.freeDrawingBrush = new PencilBrush(fabricCanvas)
+    fabricCanvas.freeDrawingBrush.color = drawingSettings.brushColor
+    fabricCanvas.freeDrawingBrush.width = drawingSettings.brushSize
+
     // Listen to multiple events that might change selection
     fabricCanvas.on("selection:created", updateSelectedProperties)
     fabricCanvas.on("selection:updated", updateSelectedProperties)
@@ -153,6 +170,16 @@ export function useFabric() {
       window.removeEventListener("keydown", handleKeyDown)
     }
   }, [canvas, deleteSelectedObject])
+
+  React.useEffect(() => {
+    if (!canvas) return
+    canvas.isDrawingMode = drawingSettings.isDrawing
+    if (canvas.freeDrawingBrush) {
+      canvas.freeDrawingBrush.color = drawingSettings.brushColor
+      canvas.freeDrawingBrush.width = drawingSettings.brushSize
+    }
+    canvas.renderAll()
+  }, [drawingSettings, canvas])
 
   function adjustCanvasSize(fabricCanvas: Canvas, isMobile: boolean) {
     const size = isMobile
@@ -338,6 +365,30 @@ export function useFabric() {
     }
   }
 
+  function toggleDrawingMode() {
+    setDrawingSettings((prev) => ({
+      ...prev,
+      isDrawing: !prev.isDrawing,
+    }))
+  }
+
+  function incrementBrushSize() {
+    setDrawingSettings((prev) => {
+      let newSize = prev.brushSize + 2
+      if (newSize > 20) {
+        newSize = 2
+      }
+      return { ...prev, brushSize: newSize }
+    })
+  }
+
+  function setBrushColor(color: string) {
+    setDrawingSettings((prev) => ({
+      ...prev,
+      brushColor: color,
+    }))
+  }
+
   function deleteSelectedObject() {
     if (!canvas) return
 
@@ -390,5 +441,9 @@ export function useFabric() {
     selectedTextProperties,
     toggleFilter,
     isImageSelected,
+    toggleDrawingMode,
+    incrementBrushSize,
+    setBrushColor,
+    drawingSettings,
   }
 }
